@@ -1,0 +1,87 @@
+[
+  {
+    "mode": "REQUIRED",
+    "name": "uid",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "langcode",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "preferred_langcode",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "preferred_admin_langcode",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "name",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "pass",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "mail",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "timezone",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "status",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "created",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "changed",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "access",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "login",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "init",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "default_langcode",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "first_name",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "last_name",
+    "type": "STRING"
+  }
+]

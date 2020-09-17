@@ -1,0 +1,37 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "bundle",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "deleted",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "REQUIRED",
+    "name": "entity_id",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "revision_id",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "langcode",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "delta",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "roles_target_id",
+    "type": "STRING"
+  }
+]

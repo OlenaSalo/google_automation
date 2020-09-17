@@ -1,0 +1,7 @@
+target
+target/*
+*.idea/
+.idea/
+output
+*.txt.gpg
+Extent-Reports/

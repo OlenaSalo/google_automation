@@ -1,0 +1,62 @@
+[
+  {
+    "mode": "REQUIRED",
+    "name": "nid",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "vid",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "langcode",
+    "type": "STRING"
+  },
+  {
+    "mode": "REQUIRED",
+    "name": "uid",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "status",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "created",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "changed",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "promote",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "sticky",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "revision_translation_affected",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "default_langcode",
+    "type": "INTEGER"
+  }
+]

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="EWS_DE_Unifiers_Automation Script" thread-count="1" verbose="1" parallel="tests">
+    <!--      project defined properties      -->
+    <parameter name="projectName" value="apps-api-dp-us-npe-ae82"/>
+    <parameter name="datasetName" value="devportal"/>
+    <parameter name="encryptFlag" value="false"/>
+    <parameter name="RESOURCES_FOLDER" value="src/test/resources/"/>
+
+
+    <test name="Functional">
+        <parameter name="env" value="Functional"/>
+        <classes>
+            <class name="com.equifax.api.testing.agregationQuery.TestBigQuery"/>
+            <class name="com.equifax.api.testing.sqlPipeline.BigQueryGeneral"/>
+        </classes>
+    </test>
+
+</suite>

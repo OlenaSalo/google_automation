@@ -1,0 +1,57 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "bundle",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "deleted",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "REQUIRED",
+    "name": "entity_id",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "revision_id",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "langcode",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "delta",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "field_product_docs_pbf_target_id",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "field_product_docs_pbf_grant_public",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "field_product_docs_pbf_grant_view",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "field_product_docs_pbf_grant_update",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "field_product_docs_pbf_grant_delete",
+    "type": "INTEGER"
+  }
+]
