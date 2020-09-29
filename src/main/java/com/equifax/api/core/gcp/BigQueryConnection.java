@@ -47,35 +47,37 @@ public class BigQueryConnection {
 
     public static TableResult getQueryResult(String query) {
 
-        try {
-            QueryJobConfiguration queryConfig =
-                    QueryJobConfiguration.newBuilder(query).setUseLegacySql(false).build();
-            /** Create a job ID so that we can safely retry. */
-            JobId jobId = JobId.of(UUID.randomUUID().toString());
-            Job queryJob = bigquery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
-            /** Wait for the query to complete. */
-            try {
-                queryJob = queryJob.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (queryJob == null) {
-                throw new RuntimeException("Job no longer exists");
-            } else if (queryJob.getStatus().getError() != null) {
-                throw new RuntimeException(queryJob.getStatus().getError().toString());
-            }
-
-            try {
-                tableResult = queryJob.getQueryResults();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return tableResult;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+//        try {
+//            QueryJobConfiguration queryConfig =
+//                    QueryJobConfiguration.newBuilder(query).setUseLegacySql(false).build();
+//            /** Create a job ID so that we can safely retry. */
+//            JobId jobId = JobId.of(UUID.randomUUID().toString());
+//            Job queryJob = bigquery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
+//            /** Wait for the query to complete. */
+//            try {
+//                queryJob = queryJob.waitFor();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            if (queryJob == null) {
+//                throw new RuntimeException("Job no longer exists");
+//            } else if (queryJob.getStatus().getError() != null) {
+//                throw new RuntimeException(queryJob.getStatus().getError().toString());
+//            }
+//
+//            try {
+//                tableResult = queryJob.getQueryResults();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            return tableResult;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+   return null;
     }
+
 
     /**
      * Method will return a map where the

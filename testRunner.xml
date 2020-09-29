@@ -14,6 +14,7 @@
         <classes>
             <class name="com.equifax.api.testing.agregationQuery.TestBigQuery"/>
             <class name="com.equifax.api.testing.sqlPipeline.BigQueryGeneral"/>
+            <class name="com.equifax.api.testing.e2eTest.E2ETest"/>
         </classes>
     </test>
 

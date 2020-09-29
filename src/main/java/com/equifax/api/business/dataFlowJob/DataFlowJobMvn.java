@@ -1,20 +1,40 @@
 package com.equifax.api.business.dataFlowJob;
 
 import com.equifax.api.core.common.CommonAPI;
+import com.equifax.api.core.common.ConfigReader;
+import com.equifax.api.core.utils.BashExecutor;
+import com.equifax.api.core.utils.BashOutput;
+import com.equifax.api.core.utils.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
-public class DataFlowJobMvn  extends CommonAPI {
+public class DataFlowJobMvn extends CommonAPI {
+    private static final Logger logger = LoggerFactory.getLogger(BashExecutor.class);
+    String jobId;
+
+    private static List<String> getResult(BufferedReader reader) throws Exception {
+        List<String> output = new LinkedList<>();
+        String line = reader.readLine();
+        while (line != null) {
+            output.add(line);
+            line = reader.readLine();
+        }
+        return output;
+    }
+
     /**
      * getting the row count from the bigQuery table
      *
      * @param tableName table to work with
      */
-    public void getBQTableRowCount(String dataSetName, String tableName) {
+    public void getBQTableRowCount(String dataSetName, String tableName) throws Exception {
         String upperCaseTableName = tableName.toUpperCase();
         String mvnCommand = "bq query SELECT COUNT(*) as TotalRow FROM " + dataSetName + "." + tableName;
         runCommand(mvnCommand);
@@ -26,7 +46,7 @@ public class DataFlowJobMvn  extends CommonAPI {
      * @param tableName table to work with
      * @throws IOException
      */
-    public void removeTableCmdFromBigQuery(String tableName) throws IOException {
+    public void removeTableCmdFromBigQuery(String tableName) throws Exception {
         String upperCaseTableName = tableName.toUpperCase();
         String mvnCommand = "bq rm -f de_dw." + upperCaseTableName;
         runCommand(mvnCommand);
@@ -37,9 +57,10 @@ public class DataFlowJobMvn  extends CommonAPI {
      *
      * @param tableName table to work with
      */
-    public void createDataFlowJob(String tableName) {
+    public void createDataFlowJob(String tableName) throws Exception {
         String upperCaseTableName = tableName.toUpperCase();
         String lowercaseTableName = tableName.toLowerCase();
+        String javaCommand = "java -cp data/";
         String mvnCommand = "mvn exec:java -Dexec.mainClass=com.equifax.ews.CsvToBigQuery -Dexec.args=\"" +
                 "--jsonSchema=" + System.getProperty("user.dir") + "/src/test/resources/schema/" + upperCaseTableName + ".json " +
                 "--inputFile=" + System.getProperty("user.dir") + "/src/test/resources/TWNTablesPGP/txtFiles/" + lowercaseTableName + ".txt.gpg " +
@@ -53,6 +74,42 @@ public class DataFlowJobMvn  extends CommonAPI {
         runCommand(mvnCommand);
     }
 
+    public void createFirestoreDataFlowJob(String tableName, String jarName) throws Exception {
+        String upperCaseTableName = tableName.toUpperCase();
+        String lowercaseTableName = tableName.toLowerCase();
+        String javaCommand = "java -cp data/" + jarName + " com.equifax.apireporting.pipelines.FirestoreToGCSPipeline" +
+                "--project=" + ConfigReader.getProperty("project_ID") +
+                "--runner=DataflowRunner" +
+                "--region=us-east1" +
+                "--gcpTempLocation=gs://java-templates/stage" +
+                "--projectID=" + ConfigReader.getProperty("project_ID") +
+                "--collectionName=" + lowercaseTableName +
+                "--outputFilePath=gs://java-templates/firestore/" + lowercaseTableName + ".json";
+        runCommand(javaCommand);
+    }
+
+    public void createCloudSqlDataFlowJob(String jarName) throws Exception {
+        String query = "\"SELECT * FROM user\"";
+        String javaCommand = "java -cp data/" + jarName + " com.equifax.apireporting.pipelines.CloudSQLToGCSPipeline" +
+                " --project=" + ConfigReader.getProperty("project_ID") +
+                " --runner=DataflowRunner" +
+                " --region=us-east1" +
+                " --gcpTempLocation=gs://java-templates/stage" +
+                " --projectID=" + ConfigReader.getProperty("project_ID") +
+                " --connectionURL=" + System.getProperty("dburl") +
+                " --driverClassName=com.mysql.jdbc.Driver" +
+                " --username=" + System.getProperty("dbusr") +
+                " --password=" + System.getProperty("dbpwd") +
+                " --query=" + query +
+                " --outputFilePath=gs://java-templates/cloudsql/cloudsql-data.json" +
+                " --usePublicIps=true" +
+                " --subnetwork=https://www.googleapis.com/compute/v1/projects/crucial-oarlock-283420/regions/us-east1/subnetworks/apigee-mock-vpc-network";
+
+
+        logger.info(String.format("Executing: %s", javaCommand));
+        runCommand(javaCommand);
+    }
+
     /**
      * create the cloud DF using cloud DF command which will tak eall the file path from the GS: bucket
      * input: gs://testviv/initialload/schema/tablename.json
@@ -61,7 +118,7 @@ public class DataFlowJobMvn  extends CommonAPI {
      *
      * @param tableName table to work with
      */
-    public void createCloudDataFlowJob(String dataset, String tableName) {
+    public void createCloudDataFlowJob(String dataset, String tableName) throws Exception {
         String tableExecutionTime = new Date().toString().replace(" ", "_") + "-" + tableName.toUpperCase();
         String upperCaseTableName = tableName.toUpperCase();
         String lowercaseTableName = tableName.toLowerCase();
@@ -83,6 +140,52 @@ public class DataFlowJobMvn  extends CommonAPI {
         runCommand(cloudmvncommand);
     }
 
+    public String creatFirestoreDataFlowJob(Parameters parameters) throws Exception {
+        BashOutput output = BashExecutor.executeCommand(parameters.getParameters());
+
+
+        System.out.println(output.getOutput());
+        for (String s : output.getOutput()) {
+            if (s.contains("Submitted job:")) {
+                jobId = s.replace("INFO: Submitted job:", "").trim();
+            }
+        }
+        assert output.getStatus() == 0;
+        return jobId;
+
+    }
+
+    public void runDataFlow(Integer time, Parameters parameters) throws Exception {
+        String jobIdd = creatFirestoreDataFlowJob(parameters);
+        long startTime = System.currentTimeMillis();
+        String command = String.format("gcloud dataflow jobs describe %s --region=us-east1", jobIdd);
+        BashOutput result;
+        do {
+            result = BashExecutor.executeCommand(command);
+            Thread.sleep(50000L);
+        } while ((result.getOutput().contains("currentState: JOB_STATE_RUNNING")
+                || result.getOutput().contains("currentState: JOB_STATE_PENDING"))
+                && (System.currentTimeMillis() - startTime) < time * 60 * 1000L);
+
+        assert (result.getOutput().contains("currentState: JOB_STATE_DONE"));
+    }
+
+    public void waitDataFlowFinishRunning(Integer time)
+            throws Exception {
+
+//        long startTime = System.currentTimeMillis();
+//        String command = String.format("gcloud dataflow jobs describe %s", jobId);
+//        BashOutput result;
+//        do {
+//            result = BashExecutor.executeCommand(command);
+//            Thread.sleep(10000L);
+//        } while ((result.getOutput().contains("currentState: JOB_STATE_RUNNING")
+//                || result.getOutput().contains("currentState: JOB_STATE_PENDING"))
+//                && (System.currentTimeMillis() - startTime) < time * 60 * 1000L);
+//
+//        assert (result.getOutput().contains("currentState: JOB_STATE_DONE"));
+    }
+
     /**
      * generate the txt file using input pgp file from gs bucket
      * input:gs://testviv/initialload/data/TWNTablePGPfiles/tablename
@@ -97,25 +200,30 @@ public class DataFlowJobMvn  extends CommonAPI {
         bigQueryConnection.uploadFileToGCS(destBucket, destFolder, copyFrom, tableName + fileExtension);
     }
 
-    public void runCommand(String command) {
-        try {
-            // Run "mvn" Windows command
-            String path = System.getProperty("user.dir");
-            Process process = Runtime.getRuntime().exec("cmd /c " + command, null,
-                    new File(path));
-            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String s;
-            System.out.println("\nStandard output: ");
+    public void runCommand(String command) throws Exception {
+
+        // Run "mvn" Windows command
+        String path = System.getProperty("user.dir");
+        Process process = Runtime.getRuntime().exec(command);
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        String s;
+        int status = process.waitFor();
+        BashOutput bashOutput = new BashOutput();
+        System.out.println("\nStandard output: ");
+        if (status == 0) {
             while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
+                logger.info(s);
+                bashOutput.setOutput(getResult(stdInput));
             }
+        } else {
             System.out.println("Standard error: ");
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                logger.error(s);
+                bashOutput.setError(getResult(stdError));
             }
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
         }
+        assert (status == 0);
+
     }
 }

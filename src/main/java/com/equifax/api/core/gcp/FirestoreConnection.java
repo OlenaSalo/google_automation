@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class FirestoreConnection {
     private static final Logger logger = LoggerFactory.getLogger(FirestoreConnection.class);
@@ -38,11 +39,10 @@ public class FirestoreConnection {
         // [START fs_add_query]
         // asynchronously query for all users born before 1900
         List<String> name = new ArrayList<>();
-        DocumentReference  docRef = db.collection("test_apps_reporting").document("EgxAlnX8TyiquDooU25q");
+        DocumentReference docRef = db.collection("test_apps_reporting").document("EgxAlnX8TyiquDooU25q");
         ApiFuture<QuerySnapshot> query = db.collection("test_apps_reporting").get();
         QuerySnapshot querySnapshot = query.get();
         List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-
 
 
         for (QueryDocumentSnapshot document : documents) {
@@ -52,14 +52,14 @@ public class FirestoreConnection {
         // [END fs_add_query]
     }
 
-    public List<String> getName() throws Exception{
+    public List<String> getName() throws Exception {
         List<String> name = new ArrayList<>();
-        DocumentReference  docRef = db.collection("test_apps_reporting").document("EgxAlnX8TyiquDooU25q");
+        DocumentReference docRef = db.collection("test_apps_reporting").document("EgxAlnX8TyiquDooU25q");
         ApiFuture<QuerySnapshot> query = db.collection("test_apps_reporting").get();
         QuerySnapshot querySnapshot = query.get();
         List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
         for (QueryDocumentSnapshot document : documents) {
-           name.add(document.getString("name"));
+            name.add(document.getString("name"));
 
         }
         return name;
@@ -73,6 +73,7 @@ public class FirestoreConnection {
         // query.get() blocks on response
         QuerySnapshot querySnapshot = query.get();
         List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+
         for (QueryDocumentSnapshot document : documents) {
             logger.info("User: " + document.getId());
             System.out.println("First: " + document.getString("first"));
@@ -83,5 +84,25 @@ public class FirestoreConnection {
             System.out.println("Born: " + document.getLong("born"));
         }
         // [END fs_get_all]
+    }
+
+    public QueryDocumentSnapshot getDocumentName() throws ExecutionException, InterruptedException {
+        ApiFuture<QuerySnapshot> query = db.collection("cities").get();
+        QuerySnapshot querySnapshot = query.get();
+        List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+        for (DocumentSnapshot document : documents) {
+            System.out.println(document.getId());
+        }
+        return documents.get(1);
+
+    }
+
+    public int retrieveNumberOfDocument(String collection) throws ExecutionException, InterruptedException {
+        ApiFuture<QuerySnapshot> query = db.collection(collection).get();
+        QuerySnapshot querySnapshot = query.get();
+        List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+
+        return documents.size();
+
     }
 }
